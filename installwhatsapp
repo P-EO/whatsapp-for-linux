@@ -29,4 +29,4 @@ if [ -f /usr/bin/apt ];then
   cd ~/
 else 
   echo -e '\e[5;101;30mSorry, this script in not designed to installed with package manager other than apt.\e[0m'
-  exit 1 
+  exit
