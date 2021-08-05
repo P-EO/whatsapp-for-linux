@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=WhatsApp
+Type=Application
+Exec=~/whatsapp-nativefier-script/WhatsApp-linux-`uname -m`/run-whatsapp.sh
+Icon=~/whatsapp-nativefier-script/WhatsApp-linux-`uname -m`/resource*/app/icon.png
