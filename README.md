@@ -3,7 +3,7 @@
 ### Install it by:
 
 ```
-wget https://raw.githubusercontent.com/ITdairy/whatsapp-nativefier/main/installwhatsapp.sh | bash
+wget https://raw.githubusercontent.com/ITdairy/whatsapp-nativefier/main/installwhatsapp | sudo bash
 ```
 
 ________________________________________________________________________
