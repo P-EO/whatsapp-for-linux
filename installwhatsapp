@@ -11,16 +11,26 @@ osInfo[/etc/debian_version]=apt
 for f in ${!osInfo[@]}
 do
     if [[ -f $f ]]; then
-        echo Package manager: ${osInfo[$f]} 
+        echo -e "\e[32mPackage manager: ${osInfo[$f]}\e[0m" 
         packagemanager=${osInfo[$f]}
     fi
 done
 
-if packagemanager=zypp; then sudo apt update
-elif packagemanager=dnf; then sudo dnf 
-elif packagemanager=apt; then sudo yum update
-elif packagemanager=zypp; then sudo 
-else echo "FAILED TO INSTALL PACKAGE: Package manager not found. You must manually install: $packagesNeeded">&2; fi
+if packagemanager=apt; then sudo apt update
+elif packagemanager=dnf; then sudo dnf update
+elif packagemanager=yum; then sudo yum update
+elif packagemanager=zypp; then sudo zypper update
+else echo "Package manager not found. You need to manually install Node.js (version >= 12.9) and npm (version >= 6.9) and run the script again.";
+fi
+
+TEST=$(sudo apt install nodejs 2>&1 > /dev/null)
+if [[ $TEST == *"not installed"* ]]; then
+  wget -qO- https://deb.nodesource.com/setup_16.x | sudo bash -
+else
+	echo "nope.."
+fi
+
+
 
 
 #Download prerequisites to nativefy WhatsApp
