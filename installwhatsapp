@@ -13,6 +13,8 @@ do
     if [[ -f $f ]]; then
         echo -e "\e[32mPackage manager: ${osInfo[$f]}\e[0m" 
         packagemanager=${osInfo[$f]}
+    else echo "Package manager not found.";
+    	exit 1
     fi
 done
 
@@ -20,15 +22,16 @@ if packagemanager=apt; then sudo apt update
 elif packagemanager=dnf; then sudo dnf update
 elif packagemanager=yum; then sudo yum update
 elif packagemanager=zypp; then sudo zypper update
-else echo "Package manager not found. You need to manually install Node.js (version >= 12.9) and npm (version >= 6.9) and run the script again.";
 fi
 
-TEST=$(sudo apt install nodejs 2>&1 > /dev/null)
-if [[ $TEST == *"not installed"* ]]; then
-  wget -qO- https://deb.nodesource.com/setup_16.x | sudo bash -
+CHECK=$(sudo apt search nodejs 2> /dev/null)
+if [[ $CHECK == *"nodejs"*"17"*"installed"* ]]; then
+  echo Nodejs already installed
 else
-	echo "nope.."
+  wget -qO- https://deb.nodesource.com/setup_16.x | sudo bash -
 fi
+
+if ! command -v npm >/dev/null; then
 
 
 
