@@ -12,7 +12,7 @@ YOU MAY [CONTACT ME](mailto:cycool29@gmail.com) IF YOU WANT TO CONTRIBUTE
 ### Install it by:
 
 ```
-wget https://raw.githubusercontent.com/ITdairy/whatsapp-nativefier/main/installwhatsapp | sudo bash
+wget https://raw.githubusercontent.com/ITdairy/whatsapp-nativefier/main/installwhatsapp |sudo bash
 ```
 
 ________________________________________________________________________
