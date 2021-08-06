@@ -1,46 +1,58 @@
 #!/bin/bash
 
 #Identifying the system package manager
-declare -A osInfo;
-osInfo[/etc/redhat-release]=yum
-osInfo[/etc/arch-release]=pacman
-osInfo[/etc/gentoo-release]=emerge
-osInfo[/etc/SuSE-release]=zypp
-osInfo[/etc/debian_version]=apt
 
-for f in ${!osInfo[@]}
-do
-    if [[ -f $f ]]; then
-        echo -e "\e[32mPackage manager: ${osInfo[$f]}\e[0m" 
-        packagemanager=${osInfo[$f]}
-    else echo "Package manager not found.";
+if [ -e /usr/bin/apt ]; then
+packagemanager=apt
+if [ -e /usr/bin/dnf ]; then
+packagemanager=dnf
+if [ -e /usr/bin/yum ]; then
+packagemanager=yum
+
+if [ -e $packagemanager ]; then
+    echo -e "\e[32mPackage manager: ${osInfo[$f]}\e[0m" 
+else 
+    echo "Package manager not found.";
     	exit 1
-    fi
-done
-
-if packagemanager=apt; then sudo apt update
-elif packagemanager=dnf; then sudo dnf update
-elif packagemanager=yum; then sudo yum update
-elif packagemanager=zypp; then sudo zypper update
 fi
 
-CHECK=$(sudo apt search nodejs 2> /dev/null)
-if [[ $CHECK == *"nodejs"*"17"*"installed"* ]]; then
-  echo Nodejs already installed
-else
-  wget -qO- https://deb.nodesource.com/setup_16.x | sudo bash -
+#Updating package list
+if $packagemanager=apt; then
+    sudo apt update 
+elif $packagemanager=yum; then
+    sudo yum check-update
+elif $packagemanager=dnf; then
+    sudo dnf check-update
 fi
-
-if ! command -v npm >/dev/null; then
-
-
-
 
 #Download prerequisites to nativefy WhatsApp
-echo -e '\e[32mPreparing...\e[39m'
-wget -qO- https://deb.nodesource.com/setup_16.x | sudo bash -
 
-sudo apt update && sudo apt install npm nodejs -y
+#Checking if Nodejs is installed 
+if [ -e /usr/bin/nodejs ]; then
+    nodejsversion=$(nodejs -v | tr -dc '0-9, .') 
+	nodejsversion2=$(nodejs -v | tr -dc '0-9, .'| head -c 2)
+fi
+
+if (($nodejsversion2>=13)) ; then
+		echo -e "\e[32mNodejs is installed, version is `nodejs -v`, compatible with Nativefier\e[0m"
+elif (($nodejsversion2<13)) ; then
+        echo -e "\e[32mNodejs is installed, version is `nodejs -v`, not compatible with Nativefier, updating...\e[0m"       
+           if packagemanager=apt; then 
+                curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - 
+           else 
+                curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
+           fi
+else 
+        echo -e "\e[32mNodejs is not installed, installing it for you... \e[0m"
+            if packagemanager=apt; then 
+                curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+            else 
+                curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
+            fi
+fi
+
+
+
 npm install -g nativefier
 sudo mkdir WhatsApp
 cd Whatsapp
