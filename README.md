@@ -1,13 +1,8 @@
-# whatsapp-nativefier-script
+# WhatsApp for Linux
 
 ## **UNDER MAINTAINENCE**
 NOT AVAILABLE YET, YOU WILL GET ERROR IF YOU INSTALL 
 
-PLEASE CONSIDER CONTRIBUTE AS I AM STILL A NEWBIE OF LINUX
-
-YOU MAY [CONTACT ME](mailto:cycool29@gmail.com) IF YOU WANT TO CONTRIBUTE
-
-##### ps: My primary language is not English so if there is any grammar/spelling mistake, please open an issue to remind me and I will edit.
 ---------------------------------------
 ### Install by:
 
