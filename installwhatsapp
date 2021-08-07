@@ -3,17 +3,17 @@
 #Identifying the system package manager
 
 if [ -e /usr/bin/apt ]; then
-packagemanager=apt
-if [ -e /usr/bin/dnf ]; then
-packagemanager=dnf
-if [ -e /usr/bin/yum ]; then
-packagemanager=yum
-
-if [ -e $packagemanager ]; then
-    echo -e "\e[32mPackage manager: ${osInfo[$f]}\e[0m" 
+	packagemanager=apt
+	echo -e "\e[32mPackage manager: $packagemanager\e[0m" 
+elif [ -e /usr/bin/dnf ]; then
+	packagemanager=dnf
+	echo -e "\e[32mPackage manager: $packagemanager\e[0m" 
+elif [ -e /usr/bin/yum ]; then
+	packagemanager=yum
+	echo -e "\e[32mPackage manager: $packagemanager\e[0m" 
 else 
-    echo "Package manager not found.";
-    	exit 1
+	echo "Package manager not found. This script only support apt, yum and dnf.";
+    		exit 1
 fi
 
 #Updating package list
@@ -25,23 +25,23 @@ elif $packagemanager=dnf; then
     sudo dnf check-update
 fi
 
+
+
 #Download prerequisites to nativefy WhatsApp
 
-#Checking if Nodejs is installed 
+#Checking if Nodejs is installed and compatible with Nativefier
 if [ -e /usr/bin/nodejs ]; then
-    nodejsversion=$(nodejs -v | tr -dc '0-9, .') 
-	nodejsversion2=$(nodejs -v | tr -dc '0-9, .'| head -c 2)
-fi
-
-if (($nodejsversion2>=13)) ; then
-		echo -e "\e[32mNodejs is installed, version is `nodejs -v`, compatible with Nativefier\e[0m"
-elif (($nodejsversion2<13)) ; then
-        echo -e "\e[32mNodejs is installed, version is `nodejs -v`, not compatible with Nativefier, updating...\e[0m"       
-           if packagemanager=apt; then 
-                curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - 
-           else 
-                curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
-           fi
+	nodejsversion=$(nodejs -v | tr -dc '0-9, .'| head -c 2)
+		if (($nodejsversion>=13)) ; then
+			echo -e "\e[32mNodejs is installed, version is `nodejs -v`, compatible with Nativefier\e[0m"
+		elif (($nodejsversion<13)) ; then
+        		echo -e "\e[32mNodejs is installed, version is `nodejs -v`, not compatible with Nativefier, updating ...\e[0m"       
+           		if packagemanager=apt; then 
+                		curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - 
+           		else 
+                		curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
+           		fi
+		fi
 else 
         echo -e "\e[32mNodejs is not installed, installing it for you... \e[0m"
             if packagemanager=apt; then 
@@ -50,6 +50,16 @@ else
                 curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
             fi
 fi
+
+#Checking if NPM is installed and compatible with Nativefier 
+
+#if [ -e /usr/bin/npm ]; then 
+#	npmversion=$(npm -v | tr -dc '0-9, .' | head -c 1)
+#		if (($npmversion>=7)) ; then 
+#			echo -e "\e[32mNPM is installed, version is `npm -v`, compatible with Nativefier\e[0m"
+#		elif (($npmversion<13)) ; then
+#			echo -e "\e[32mNPM is instlled, version is `npm -v`, not compatible with Nativefier, updating ...\e[0m"
+			
 
 
 
