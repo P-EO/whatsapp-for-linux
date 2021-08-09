@@ -2,4 +2,4 @@
 Name=WhatsApp
 Type=Application
 Exec=~/WhatsApp/WhatsApp-linux-`uname -m`/run-whatsapp.sh
-Icon=~/WhatsApp/WhatsApp-linux-`uname -m`/resources/app/icon.png
+Icon=~/WhatsApp/whatsapp.png
