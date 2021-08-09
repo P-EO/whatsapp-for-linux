@@ -2,19 +2,20 @@
 
 {
 # Identifying the system package manager
-if [ -e /usr/bin/apt ]; then
+if command -v apt; then
 	packagemanager=apt
 	echo -e "\e[32mPackage manager: $packagemanager\e[0m" 
-elif [ -e /usr/bin/dnf ]; then
+elif command -v dnf; then
 	packagemanager=dnf
 	echo -e "\e[32mPackage manager: $packagemanager\e[0m" 
-elif [ -e /usr/bin/yum ]; then
+elif command -v yum; then
 	packagemanager=yum
 	echo -e "\e[32mPackage manager: $packagemanager\e[0m" 
 else 
 	echo -e "\e[41;5mPackage manager not found. This script only support apt, yum and dnf.\e[0m";
     	exit 1
 fi
+
 
 # Updating package list
 if $packagemanager=apt; then
@@ -27,7 +28,6 @@ fi
 
 
 # Installing Nodejs and NPM
-echo -e "\e[32mInstalling Nodejs and NPM ... \e[0m"
 if $packagemanager=apt; then 
 	curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 	sudo apt install nodejs npm
@@ -40,8 +40,8 @@ fi
 # Installing Nativefier
 if command -v npm > /dev/null; then
 	npm install -g nativefier
-	sudo mkdir ~/WhatsApp
-	cd ~/WhatsApp
+	sudo mkdir $HOME/WhatsApp
+	cd $HOME/WhatsApp
 	wget https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/run-whatsapp.sh
 	wget https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.desktop
 	wget https://github.com/ITdairy/whatsapp-for-linux/raw/main/whatsapp.png
@@ -68,9 +68,9 @@ fi
 
 #Create desktop & menu shortcut
 sudo cp ./whatsapp.desktop /usr/share/applications
-sudo cp ./whatsapp.desktop ~/Desktop
+sudo cp ./whatsapp.desktop $HOME/Desktop
 echo -e '\e[32mDone! You can now run WhatsApp from desktop and menu bar.\e[39m'
 echo -e "\e[101mPlease let me know if you can't see desktop shortcut and menu bar shortcut!\e[0m"
-cd ~/
+cd $HOME/
 
-} 2> ~/WhatsApp/error.log
+} 2> $HOME/WhatsApp/error.log
