@@ -1,5 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
+{
 # Identifying the system package manager
 if [ -e /usr/bin/apt ]; then
 	packagemanager=apt
@@ -11,8 +12,8 @@ elif [ -e /usr/bin/yum ]; then
 	packagemanager=yum
 	echo -e "\e[32mPackage manager: $packagemanager\e[0m" 
 else 
-	echo "Package manager not found. This script only support apt, yum and dnf.";
-    		exit 1
+	echo -e "\e[41;5mPackage manager not found. This script only support apt, yum and dnf.\e[0m";
+    	exit 1
 fi
 
 # Updating package list
@@ -25,45 +26,14 @@ elif $packagemanager=dnf; then
 fi
 
 
-# Checking prerequisites to nativefy WhatsApp
-echo -e "\e[30;42mChecking prerequisites to nativefy WhatsApp\e[0m"
-
-
 # Installing Nodejs and NPM
-if ! command -v nodejs npm ; then
-	nodejsversion=$(nodejs -v | tr -dc '0-9, .'| head -c 2)
-	npmversion=$(npm -v | head -c 1)
-		if (($nodejsversion>=13)) && (($npmversion>=7)); then
-			echo -e "\e[32mNodejs and NPM is installed, Nodejs version is `nodejs -v` and NPM version is `npm -v`, compatible with Nativefier\e[0m"
-		elif (($nodejsversion<13)) ; (($npmversion<7)); then
-        		echo -e "\e[32mNodejs and NPM is installed, Nodejs version is `nodejs -v` and NPM version is `npm -v`, both not compatible with Nativefier, updating ...\e[0m"       
-           		if packagemanager=apt; then 
-                		curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - 
-           		else 
-                		curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
-           		fi
-		elif (($nodejsversion>=13)) ; (($npmversion<7)); then
-        		echo -e "\e[32mNodejs and NPM is installed, Nodejs version is `nodejs -v` and NPM version is `npm -v`, NPM not compatible with Nativefier, updating ...\e[0m"       
-           		if packagemanager=apt; then 
-                		curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - 
-           		else 
-                		curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
-           		fi
-		elif (($nodejsversion<13)) ; (($npmversion>=7)); then
-        		echo -e "\e[32mNodejs and NPM is installed, Nodejs version is `nodejs -v` and NPM version is `npm -v`, Nodejs not compatible with Nativefier, updating ...\e[0m"       
-           		if packagemanager=apt; then 
-                		curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - 
-           		else 
-                		curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
-           		fi
-		fi
-else
-	echo -e "\e[32mInstalling Nodejs and NPM for you... \e[0m"
-            if packagemanager=apt; then 
-                curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-            else 
-                curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
-            fi
+echo -e "\e[32mInstalling Nodejs and NPM ... \e[0m"
+if $packagemanager=apt; then 
+	curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+	sudo apt install nodejs npm
+else 
+	curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash -
+	sudo $packagemanager install nodejs npm
 fi
 
 
@@ -74,12 +44,14 @@ if command -v npm > /dev/null; then
 	cd ~/WhatsApp
 	wget https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/run-whatsapp.sh
 	wget https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.desktop
+	wget https://github.com/ITdairy/whatsapp-for-linux/raw/main/whatsapp.png
 else
-	echo "Failed"
+	echo -e "\e[41;5mFailed. NPM not found.\e[0m"
+	exit 1
 fi
 
 
-#Nativefier WhatsApp with user agent
+#Nativefying WhatsApp 
 if command -v nativefier > /dev/null; then
 	echo -e '\e[32mNativefying WhatsApp from http://web.whatsapp.com ...\e[39m'
 	nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a `uname -m` --maximize -n WhatsApp
@@ -89,7 +61,9 @@ if command -v nativefier > /dev/null; then
 	cd ..
 	echo -e '\e[32mDone installing WhatsApp, Creating desktop shortcut and menu shortcut...'
 else 
-	echo "Failed"
+	echo -e "\e[41;5mFailed. Nativefier not found.\e[0m"
+	exit 1
+fi
 
 
 #Create desktop & menu shortcut
@@ -99,3 +73,4 @@ echo -e '\e[32mDone! You can now run WhatsApp from desktop and menu bar.\e[39m'
 echo -e "\e[101mPlease let me know if you can't see desktop shortcut and menu bar shortcut!\e[0m"
 cd ~/
 
+} 2> ~/WhatsApp/error.log
