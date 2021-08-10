@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-{
 # Identifying the system package manager
 if command -v apt; then
 	packagemanager=apt
@@ -55,10 +54,9 @@ fi
 if command -v nativefier > /dev/null; then
 	echo -e '\e[32mNativefying WhatsApp from http://web.whatsapp.com ...\e[39m'
 	nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a `uname -m` --maximize -n WhatsApp
-	cd ./WhatsApp-linux-`uname -m`
-	sudo cp ../run-whatsapp.sh ./
-	sudo chmod +x ./run-whatsapp.sh
-	cd ..
+	sudo touch run-whatsapp
+	echo 'sudo rm -rf "$HOME/.config/whatsapp-nativefier-*/Service Worker" && $HOME/WhatsApp/WhatsApp-linux-`uname -m`/WhatsApp' > ./run-whatsapp
+	sudo chmod +x ./run-whatsapp
 	echo -e '\e[32mDone installing WhatsApp, Creating desktop shortcut and menu shortcut...'
 else 
 	echo -e "\e[41;5mFailed. Nativefier not found.\e[0m"
@@ -67,10 +65,7 @@ fi
 
 
 #Create desktop & menu shortcut
-sudo cp ./whatsapp.desktop /usr/share/applications
+sudo cp ./whatsapp.desktop $HOME/.local/share/applications
 sudo cp ./whatsapp.desktop $HOME/Desktop
-echo -e '\e[32mDone! You can now run WhatsApp from desktop and menu bar.\e[39m'
-echo -e "\e[101mPlease let me know if you can't see desktop shortcut and menu bar shortcut!\e[0m"
-cd $HOME/
-
-} 2> $HOME/WhatsApp/error.log
+echo -e '\e[32mDone! You should be able to run WhatsApp from desktop and menu bar.\e[39m'
+cd
