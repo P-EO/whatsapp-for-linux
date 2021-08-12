@@ -12,7 +12,8 @@ elif command -v dnf > /dev/null; then
 elif command -v yum > /dev/null; then
     packagemanager=yum
     echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
-    sudo $packagemanager install wget curl -y
+    sudo $packagemanager install curl -y
+    sudo $packagemanager install wget -y
 else
     echo -e "\\e[41;5mPackage manager not found. This script only support apt, yum and dnf.\\e[0m";
     exit 1
