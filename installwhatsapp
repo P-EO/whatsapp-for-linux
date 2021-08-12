@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 # Identifying the system package manager
-if command -v apt; then
+if command -v apt > /dev/null; then
     packagemanager=apt
     echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
     sudo $packagemanager install wget curl
-elif command -v dnf; then
+elif command -v dnf > /dev/null; then
     packagemanager=dnf
     echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
     sudo $packagemanager install wget curl
-elif command -v yum; then
+elif command -v yum > /dev/null; then
     packagemanager=yum
     echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
     sudo $packagemanager install wget curl
@@ -23,26 +23,26 @@ fi
 if [ $packagemanager == 'apt' ]; then
     echo -e "\\e[32mAdding NodeSource...\\e[0m"
     curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - > /dev/null
-    echo -e "\\e[32mRunning sudo apt update...\\e[0m"
+    echo -e "\\e[32mRunning sudo apt update and sudo apt install nodejs -y...\\e[0m"
     sudo apt update > /dev/null
-    sudo apt install nodejs > /dev/null
+    sudo apt install nodejs -y > /dev/null
 else
     echo -e "\\e[32mAdding NodeSource...\\e[0m"
     curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - > /dev/null
+    echo -e "\\e[32mRunning sudo $packagemanager check-update and sudo $packagemanager install nodejs -y...\\e[0m"
     sudo $packagemanager check-update > /dev/null
-    echo -e "\\e[32mRunning sudo $packagemanager update...\\e[0m"
-    sudo $packagemanager install nodejs > /dev/null
+    sudo $packagemanager install nodejs -y > /dev/null
 fi
 
 
 # Installing Nativefier
 if command -v npm > /dev/null; then
-    npm install -g nativefier
-    sudo mkdir "${HOME}/WhatsApp"
+    npm install -g nativefier || exit 1 
+    sudo mkdir "${HOME}/WhatsApp" || exit 1
     cd "${HOME}/WhatsApp" || exit 1
-    wget https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/run-whatsapp.sh
-    wget https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.desktop
-    wget https://github.com/ITdairy/whatsapp-for-linux/raw/main/whatsapp.png
+    wget -qo- https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/run-whatsapp.sh || exit 1 
+    wget -qo- https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.desktop || exit 1 
+    wget -qo- https://github.com/ITdairy/whatsapp-for-linux/raw/main/whatsapp.png || exit 1 
 else
     echo -e "\\e[41;5mFailed. NPM not found.\\e[0m"
     exit 1
