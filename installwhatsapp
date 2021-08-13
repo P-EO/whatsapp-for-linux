@@ -35,7 +35,7 @@ else
     error "Package manager not found. This script only support apt, yum and dnf."
 fi
 
-echo ""
+echo -e "\n"
 
 # Installing Nodejs and NPM
 if [ $packagemanager == 'apt' ]; then
