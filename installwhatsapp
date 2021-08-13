@@ -6,7 +6,7 @@ function error {
 }
 
 function reduceapt { 
-  grep -v "apt does not have a stable CLI interface.\\|Hit\\|Reading package lists...\\|newest version\\|Building dependency tree\\|Reading state information...\\|Need to get\\|After this operation,\\|Get:\\|Fetched\\|Selecting previously unselected package\\|Preparing to unpack\\|Unpacking \\|Setting up \\|Processing triggers for "
+  grep -v "apt does not have a stable CLI interface.\\|Hit\\|to remove\\|Reading package lists...\\|newest version\\|Building dependency tree\\|Reading state information...\\|Need to get\\|After this operation,\\|Get:\\|Fetched\\|Selecting previously unselected package\\|Preparing to unpack\\|Unpacking \\|Setting up \\|Processing triggers for "
 }
 
 cd "${HOME}" || exit 1 
@@ -17,8 +17,9 @@ echo ""
 # Identifying the system package manager
 if command -v apt > /dev/null; then
     packagemanager=apt
-    echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
-    ( sudo $packagemanager update 2>&1 || error "Failed updating package list." ) | reduceapt
+    echo -e "\\e[32mPackage manager is $packagemanager\n\n\nUpdating package list...\\e[0m"
+    ( sudo $packagemanager update 2>&1 || error "Failed updating package list." ) | reduceapt && echo -e 
+    echo -e "\n\n\\e[32mInstalling wget and curl...\\e[0m"
     ( sudo $packagemanager install wget curl -y 2>&1 || error "Failed installing wget and curl" ) | reduceapt
 elif command -v dnf > /dev/null; then
     packagemanager=dnf
