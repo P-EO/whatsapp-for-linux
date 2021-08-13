@@ -5,8 +5,8 @@ function error {
   exit 1 
 }
 
-function reduceapt { 
-  grep -v "apt does not have a stable CLI interface.\\|Hit\\|to remove\\|Reading package lists...\\|newest version\\|Building dependency tree\\|Reading state information...\\|Need to get\\|After this operation,\\|Get:\\|Fetched\\|Selecting previously unselected package\\|Preparing to unpack\\|Unpacking \\|Setting up \\|Processing triggers for "
+function reduceoutput { 
+  grep -v "apt does not have a stable CLI interface.\\|Hit\\|Packaging\\|Preparing\\|Converting\\|Finalizing\\|App built to\\|shortcuts are up to you\\|to remove\\|Reading package lists...\\|newest version\\|Building dependency tree\\|Reading state information...\\|Need to get\\|After this operation,\\|Get:\\|Fetched\\|Selecting previously unselected package\\|Preparing to unpack\\|Unpacking \\|Setting up \\|Processing triggers for "
 }
 
 cd "${HOME}" || exit 1 
@@ -18,9 +18,8 @@ echo ""
 if command -v apt > /dev/null; then
     packagemanager=apt
     echo -e "\\e[32mPackage manager is $packagemanager\n\n\nUpdating package list...\\e[0m"
-    ( sudo $packagemanager update 2>&1 || error "Failed updating package list." ) | reduceapt && echo -e 
-    echo -e "\n\n\\e[32mInstalling wget and curl...\\e[0m"
-    ( sudo $packagemanager install wget curl -y 2>&1 || error "Failed installing wget and curl" ) | reduceapt
+    ( sudo $packagemanager update 2>&1 || error "Failed updating package list." ) | reduceoutput && echo -e  "\n\n\\e[32mInstalling wget and curl...\\e[0m"
+    ( sudo $packagemanager install wget curl -y 2>&1 || error "Failed installing wget and curl" ) | reduceoutput
 elif command -v dnf > /dev/null; then
     packagemanager=dnf
     echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
@@ -36,14 +35,14 @@ else
     error "Package manager not found. This script only support apt, yum and dnf."
 fi
 
-echo -e "\n"
 
 # Installing Nodejs and NPM
 if [ $packagemanager == 'apt' ]; then
         echo -e "\\e[32mAdding NodeSource...\\e[0m"
         curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - > /dev/null || error "Failed adding NodeSource. Try running 'curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - ' and run this script again. "
-        echo -e "\\e[32mRunning sudo apt update and sudo apt install nodejs -y...\\e[0m"
-        ( ( sudo apt update && sudo apt install nodejs -y ) > /dev/null ) || error "Failed installing Nodejs. Try running 'sudo apt install nodejs' and run the script again."
+        echo -e "\\e[32m\\n\\nRunning sudo apt update and sudo apt install nodejs -y...\\e[0m"
+        ( sudo $packagemanager update || error "Failed updating package list." ) 2>&1 | reduceoutput
+        ( sudo $packagemanager install nodejs -y || error "Failed updating package list." ) 2>&1 | reduceoutput
     else
         echo -e "\\e[32mAdding NodeSource...\\e[0m"
         curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - > /dev/null || error "Failed adding NodeSource. Try running 'curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - ' and run this script again."
@@ -55,12 +54,15 @@ fi
 # Installing Nativefier
 if command -v npm > /dev/null; then
     if ! command -v nativefier > /dev/null; then
+        echo -e "\\e[32mInstalling Nativefier...\\e[0m"
         npm install -g nativefier || error "Failed installing Nativefier. Try running 'npm install -g nativefier' and run this script again."
         sudo mkdir "${HOME}/WhatsApp" || error "Failed creating folder in your home folder."
         cd "${HOME}/WhatsApp" || error "Failed cd to WhatsApp folder."
         wget -qo- https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/run-whatsapp.sh 
         wget -qo- https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.desktop 
         wget -qo- https://github.com/ITdairy/whatsapp-for-linux/raw/main/whatsapp.png 
+    else 
+        echo -e "\\e[32mNativefier is already installed.\\e[0m"
     fi
 else
     error "Failed. NPM not found. Try running 'sudo $packagemanager install nodejs' and run this script again."
@@ -69,8 +71,8 @@ fi
 
 #Nativefying WhatsApp
 if command -v nativefier > /dev/null; then
-    echo -e "\\e[32mNativefying WhatsApp from http://web.whatsapp.com ...\\e[39m"
-    nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a "$(uname -m)" --maximize -n WhatsApp > /dev/null
+    echo -e "\\e[32m\n\nNativefying WhatsApp from http://web.whatsapp.com ...\\e[39m"
+    (nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a "$(uname -m)" --maximize -n WhatsApp ) 2>&1 | reduceoutput
     sudo touch run-whatsapp
     echo "sudo rm -rf ${HOME}/.config/whatsapp-nativefier-*/Service Worker && $HOME/WhatsApp/WhatsApp-linux-$(uname -m)/WhatsApp" > ./run-whatsapp
     sudo chmod +x ./run-whatsapp
