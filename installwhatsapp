@@ -1,33 +1,33 @@
 #!/usr/bin/env bash
 
 function error {
-  echo -e "\e[41;5m$1\e[0m"
+  echo -e "\\e[41;5m$1\\e[0m"
   exit 1 
 }
 
 function reduceapt { 
-  grep -v "apt does not have a stable CLI interface.\|Hit\|Reading package lists...\|Building dependency tree\|Reading state information...\|Need to get\|After this operation,\|Get:\|Fetched\|Selecting previously unselected package\|Preparing to unpack\|Unpacking \|Setting up \|Processing triggers for "
+  grep -v "apt does not have a stable CLI interface.\\|Hit\\|Reading package lists...\\|Building dependency tree\\|Reading state information...\\|Need to get\\|After this operation,\\|Get:\\|Fetched\\|Selecting previously unselected package\\|Preparing to unpack\\|Unpacking \\|Setting up \\|Processing triggers for "
 }
 
-cd "${HOME}"
+cd "${HOME}" || exit 1 
 
 # Identifying the system package manager
 if command -v apt > /dev/null; then
     packagemanager=apt
     echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
-    ( sudo $packagemanager update 2>1 || error "Failed updating package list." ) | reduceapt
-    sudo $packagemanager install wget curl -y 2>1 || error "Failed installing wget and curl" | reduceapt
+    ( sudo $packagemanager update 2>&1 || error "Failed updating package list." ) | reduceapt
+    ( sudo $packagemanager install wget curl -y 2>&1 || error "Failed installing wget and curl" ) | reduceapt
 elif command -v dnf > /dev/null; then
     packagemanager=dnf
     echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
-    sudo $packagemanager check-update > /dev/null || error "Failed updating package list."
+    sudo $packagemanager check-update > /dev/null
     sudo $packagemanager install wget curl -y > /dev/null || error "Failed installing wget and curl"
 elif command -v yum > /dev/null; then
     packagemanager=yum
     echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
-    sudo $packagemanager check-update > /dev/null || error "Failed updating package list."
-    sudo $packagemanager install curl -y > /dev/null || error "Failed installing curl"
-    sudo $packagemanager install wget -y > /dev/null || error "Failed installing wget"
+    sudo $packagemanager check-update 
+    sudo $packagemanager install curl -y || error "Failed installing curl"
+    sudo $packagemanager install wget -y || error "Failed installing wget"
 else
     error "Package manager not found. This script only support apt, yum and dnf."
 fi
@@ -38,12 +38,12 @@ if [ $packagemanager == 'apt' ]; then
         echo -e "\\e[32mAdding NodeSource...\\e[0m"
         curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - > /dev/null || error "Failed adding NodeSource. Try running 'curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - ' and run this script again. "
         echo -e "\\e[32mRunning sudo apt update and sudo apt install nodejs -y...\\e[0m"
-        (( sudo apt update && sudo apt install nodejs -y ) > /dev/null ) || error "Failed installing Nodejs. Try running 'sudo apt install nodejs' and run the script again."
+        ( ( sudo apt update && sudo apt install nodejs -y ) > /dev/null ) || error "Failed installing Nodejs. Try running 'sudo apt install nodejs' and run the script again."
     else
         echo -e "\\e[32mAdding NodeSource...\\e[0m"
         curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - > /dev/null || error "Failed adding NodeSource. Try running 'curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - ' and run this script again."
         echo -e "\\e[32mRunning sudo $packagemanager check-update and sudo $packagemanager install nodejs -y...\\e[0m"
-        ((sudo $packagemanager check-update && sudo $packagemanager install nodejs -y ) > /dev/null )  || error "Failed installing Nodejs. Try running 'sudo $packagemanager install nodejs' and run this script again."
+        ( (sudo $packagemanager check-update && sudo $packagemanager install nodejs -y ) > /dev/null )  || error "Failed installing Nodejs. Try running 'sudo $packagemanager install nodejs' and run this script again."
 fi
 
 
@@ -52,10 +52,11 @@ if command -v npm > /dev/null; then
     if ! command -v nativefier > /dev/null; then
         npm install -g nativefier || error "Failed installing Nativefier. Try running 'npm install -g nativefier' and run this script again."
         sudo mkdir "${HOME}/WhatsApp" || error "Failed creating folder in your home folder."
-        cd ${HOME}/WhatsApp
+        cd "${HOME}/WhatsApp" || error "Failed cd to WhatsApp folder."
         wget -qo- https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/run-whatsapp.sh 
         wget -qo- https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.desktop 
         wget -qo- https://github.com/ITdairy/whatsapp-for-linux/raw/main/whatsapp.png 
+    fi
 else
     error "Failed. NPM not found. Try running 'sudo $packagemanager install nodejs' and run this script again."
 fi
@@ -78,4 +79,4 @@ fi
 sudo cp ./whatsapp.desktop "$HOME/.local/share/applications"
 sudo cp ./whatsapp.desktop "$HOME/Desktop"
 echo -e '\\e[32mDone! You should be able to run WhatsApp from desktop and menu bar.\\e[39m'
-cd "$HOME"  || exit 0
+cd "$HOME"  || exit 
