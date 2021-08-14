@@ -51,6 +51,7 @@ if [ $packagemanager == 'apt' ]; then
 fi
 
 
+
 # Installing Nativefier
 if command -v npm > /dev/null; then
     if ! command -v nativefier > /dev/null; then
@@ -68,11 +69,18 @@ else
     error "Failed. NPM not found. Try running 'sudo $packagemanager install nodejs' and run this script again."
 fi
 
+# Identifying architecture
+arch=$(uname -m)
+
+# Fix nativefier can't detect x86_64 architecture
+if [ "$arch" == x86_64 ]; then
+    arch=x64 
+fi
 
 #Nativefying WhatsApp
 if command -v nativefier > /dev/null; then
     echo -e "\\e[32m\n\nNativefying WhatsApp from http://web.whatsapp.com ...\\e[39m"
-    (nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a "$(uname -m)" --maximize -n WhatsApp ) 2>&1 | reduceoutput
+    (nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a "$arch" --maximize -n WhatsApp ) 2>&1 | reduceoutput
     sudo touch run-whatsapp
     echo "sudo rm -rf ${HOME}/.config/whatsapp-nativefier-*/Service Worker && $HOME/WhatsApp/WhatsApp-linux-$(uname -m)/WhatsApp" > ./run-whatsapp
     sudo chmod +x ./run-whatsapp
