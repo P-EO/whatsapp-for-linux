@@ -13,12 +13,13 @@ function success {
 
 # To reduce annoying stderr output by apt & nativefier
 function reduceoutput { 
-  grep -v "apt does not have a stable CLI interface.\\|Hit\\|Packaging\\|Preparing\\|Converting\\|Finalizing\\|App built to\\|shortcuts are up to you\\|to remove\\|Reading package lists...\\|newest version\\|Building dependency tree\\|Reading state information...\\|Need to get\\|After this operation,\\|Get:\\|Fetched\\|Selecting previously unselected package\\|Preparing to unpack\\|Unpacking \\|Setting up \\|Processing triggers for "
+  grep -v "apt does not have a stable CLI interface.\\|are up to date\\|Hit\\|Packaging\\|Preparing\\|Converting\\|Finalizing\\|App built to\\|shortcuts are up to you\\|to remove\\|Reading package lists...\\|newest version\\|Building dependency tree\\|Reading state information...\\|Need to get\\|After this operation,\\|Get:\\|Fetched\\|Selecting previously unselected package\\|Preparing to unpack\\|Unpacking \\|Setting up \\|Processing triggers for "
 }
 
 # Log errors
-function log
-  tee 
+function log {
+  tee $directory/log.txt
+}
 
 # Check if user using root privilege to run this script
 if [[ "$(id -u)" == 0 ]]; then
@@ -26,16 +27,17 @@ if [[ "$(id -u)" == 0 ]]; then
 fi
 
 sudo rm -rf "${HOME}/WhatsApp" 2>&1 > /dev/null
-sudo mkdir "${HOME}/WhatsApp" || error "Failed creating folder in your home folder."
+sudo mkdir "${HOME}/WhatsApp" | log || error  "Failed creating folder in your home folder."
 directory="${HOME}/WhatsApp"
-cd $directory || error "Failed to cd to $directory"
+cd $directory | log || error  "Failed to cd to $directory"
+touch log.txt
 echo ""
 
 # Identifying the system package manager
 if command -v apt > /dev/null; then
     packagemanager=apt
     echo -e "\\e[32mPackage manager is $packagemanager\n\n\nUpdating package list...\\e[0m"
-    ( sudo $packagemanager update 2>&1 || error "Failed updating package list." ) | reduceoutput 
+    ( sudo $packagemanager update 2>&1 | log || error "Failed updating package list." ) | reduceoutput 
     echo -e  "\n\n\\e[32mInstalling wget and curl...\\e[0m"
     ( sudo $packagemanager install wget curl -y 2>&1 || error "Failed installing wget and curl" ) | reduceoutput
 elif command -v dnf > /dev/null; then
@@ -47,8 +49,8 @@ elif command -v yum > /dev/null; then
     packagemanager=yum
     echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
     sudo $packagemanager check-update 
-    sudo $packagemanager install curl -y || error "Failed installing curl"
-    sudo $packagemanager install wget -y || error "Failed installing wget"
+    sudo $packagemanager install curl -y | log || error  "Failed installing curl"
+    sudo $packagemanager install wget -y | log || error  "Failed installing wget"
 else
     error "Package manager not found. This script only support apt, yum and dnf."
 fi
@@ -66,8 +68,8 @@ if ! command -v snap > /dev/null; then
 if command -v npm > /dev/null; then
     if ! command -v nativefier > /dev/null; then
         echo -e "\\e[32mInstalling Nativefier...\\e[0m"
-        npm install -g nativefier || error "Failed installing Nativefier. Try running 'npm install -g nativefier' and run this script again."
-        cd "${HOME}/WhatsApp" || error "Failed cd to WhatsApp folder."
+        npm install -g nativefier | log || error  "Failed installing Nativefier. Try running 'npm install -g nativefier' and run this script again."
+        cd "${HOME}/WhatsApp" | log || error  "Failed cd to WhatsApp folder."
         wget -qo-  https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/run-whatsapp.sh  https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.desktop https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.png | error "Failed to download files."
         if command -v nativefier > /dev/null; then
             success "Nativefier installed successfully."
