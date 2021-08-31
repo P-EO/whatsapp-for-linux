@@ -1,0 +1,3 @@
+https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/run-whatsapp.sh  
+https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.desktop 
+https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.png
