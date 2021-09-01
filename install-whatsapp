@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+echo "  ▄▄█▀▀▀▀▀▀▀█▄▄		 _       ____          __       __    _                 
+▄█▀░░░▄▄░░░░░░░▀█▄	| |     / / /_  ____ _/ /______/ /   (_)___  __  ___  __
+█░░░░███░░░░░░░░░█	| | /| / / __ \/ __ '/ __/ ___/ /   / / __ \/ / / / |/_/
+█░░░░██▄░░░░░░░░░█	| |/ |/ / / / / /_/ / /_(__  ) /___/ / / / / /_/ />  <  
+█░░░░░▀██▄░██░░░░█	|__/|__/_/ /_/\__,_/\__/____/_____/_/_/ /_/\__,_/_/|_|  
+█░░░░░░░▀███▀░░░█	
+▀█▄░░░░░░░░░░░▄█▀	
+  █░░░░▄▄▄▄▄█▀▀		
+ ▄▀░▄█▀				
+ ▀▀▀			"	
 # A simple error function
 function error {
   echo -e "\\e[41;30m$1\\e[0m"
@@ -34,24 +44,33 @@ cd "$directory" | log || error  "Failed to cd to $directory"
 touch log.txt
 echo ""
 
+
 # Identifying the system package manager
 if command -v apt > /dev/null; then
     packagemanager=apt
-    echo -e "\\e[32mPackage manager is $packagemanager\\n\\n\\nUpdating package list...\\e[0m"
-    ( sudo $packagemanager update 2>&1 | log || error "Failed updating package list." ) | reduceoutput 
-    echo -e  "\\n\\n\\e[32mInstalling wget and curl...\\e[0m"
-    ( sudo $packagemanager install wget curl -y 2>&1 || error "Failed installing wget and curl" ) | reduceoutput
+    success "Your package manager is $packagemanager"
+    echo -e "\\n\\n"    
+    success "Updating package list..."
+    ( sudo $packagemanager update 2>&1 | log || error "Failed updating package list." ) 
+    echo -e "\n"
+    success "Installing wget and curl..."
+    echo ""
+    ( sudo $packagemanager install wget curl git -y 2>&1 || error "Failed installing wget and curl." ) 
+    echo -e "\n"
 elif command -v dnf > /dev/null; then
     packagemanager=dnf
-    echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
-    sudo $packagemanager check-update > /dev/null
-    sudo $packagemanager install wget curl -y > /dev/null || error "Failed installing wget and curl"
+    success "Your package manager is $packagemanager"
+    sudo $packagemanager check-update | log
+    sudo $packagemanager install curl -y | log || error  "Failed installing curl."
+    sudo $packagemanager install wget -y | log || error  "Failed installing wget."
+    sudo $packagemanager install git -y | log || error  "Failed installing git."
 elif command -v yum > /dev/null; then
     packagemanager=yum
-    echo -e "\\e[32mPackage manager is $packagemanager\\e[0m"
-    sudo $packagemanager check-update 
-    sudo $packagemanager install curl -y | log || error  "Failed installing curl"
-    sudo $packagemanager install wget -y | log || error  "Failed installing wget"
+    success "Your package manager is $packagemanager"
+    sudo $packagemanager check-update  | log
+    sudo $packagemanager install curl -y | log || error  "Failed installing curl."
+    sudo $packagemanager install wget -y | log || error  "Failed installing wget."
+    sudo $packagemanager install git -y | log || error  "Failed installing git."
 else
     error "Package manager not found. This script only support apt, yum and dnf."
 fi
@@ -69,15 +88,14 @@ fi
 # Installing Nativefier
 if command -v npm > /dev/null; then
     if ! command -v nativefier > /dev/null; then
-        echo -e "\\e[32mInstalling Nativefier...\\e[0m"
+        success "Installing Nativefier..."
         npm install -g nativefier | log || error  "Failed installing Nativefier. Try running 'npm install -g nativefier' and run this script again."
         cd "${HOME}/WhatsApp" | log || error  "Failed cd to WhatsApp folder."
-        wget -qo-  https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/run-whatsapp.sh  https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.desktop https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/whatsapp.png | error "Failed to download files."
         if command -v nativefier > /dev/null; then
             success "Nativefier installed successfully."
         fi
     else 
-        success "\\e[32mNativefier is already installed.\\e[0m"
+        success "Nativefier is already installed."
     fi
 else
     error "Failed. NPM not found. Try running 'sudo snap install node --classic' and run this script again."
@@ -91,22 +109,31 @@ if [ "$arch" == x86_64 ]; then
     arch=x64 
 fi
 
+echo -e "\n\n"
+
 #Nativefying WhatsApp
 if command -v nativefier > /dev/null; then
-    success "Nativefier installed successfully."
-    echo -e "\\e[32m\\n\\nNativefying WhatsApp from http://web.whatsapp.com ...\\e[39m"
-    (nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a "$arch" --maximize -n WhatsApp ) 2>&1 | reduceoutput
-    sudo touch run-whatsapp
-    echo "sudo rm -rf ${HOME}/.config/whatsapp-nativefier-*/Service Worker && $HOME/WhatsApp/WhatsApp-linux-$(uname -m)/WhatsApp" > ./run-whatsapp
-    sudo chmod +x ./run-whatsapp
-    echo -e "\\e[32mDone installing WhatsApp, Creating desktop shortcut and menu shortcut..."
+    success "Nativefying WhatsApp from http://web.whatsapp.com ..."
+    cd "$directory" || error "Failed to cd to $directory"
+    (nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a "$arch" --maximize -n WhatsApp ) 
+    echo -e "\n"
+    success "Successfully nativefied WhatsApp."
 else
     error "Failed. Nativefier not found. Try running 'npm install -g nativefier' or with root 'sudo npm install -g nativefier' and run this script again. "
 fi
 
+echo -e "\n"
 
 #Create desktop & menu shortcut
-sudo cp ./whatsapp.desktop "$HOME/.local/share/applications"
-sudo cp ./whatsapp.desktop "$HOME/Desktop"
-echo -e "\\e[32mDone! You should be able to run WhatsApp from desktop and menu bar.\\e[39m"
+success "Creating desktop shortcut and menu shortcut..."
+echo ""
+cd "$directory" || error "Failed to cd to $directory."
+git clone https://github.com/ITdairy/whatsapp-for-linux
+echo -e "\n"
+sudo cp ./whatsapp-for-linux/* ./ && sudo rm -rf ./whatsapp-for-linux
+sudo cp ./whatsapp.desktop "$HOME/.local/share/applications" | log
+sudo cp ./whatsapp.desktop "$HOME/Desktop" | log
+sudo cp ./run-whatsapp ./WhatsApp-linux-$arch
+success "Done! You should be able to run WhatsApp from desktop and menu bar."
+echo -e "\n\n"
 cd "$HOME"  || exit 
