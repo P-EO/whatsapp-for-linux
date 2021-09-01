@@ -21,18 +21,18 @@ if [[ "$(id -u)" == 0 ]]; then
 	error "This script is not designed to be runned as root! Please try again as a regular user." 
 fi
 
-# Create new WhatsApp directory and a blank file to store logs 
-sudo rm -rf "${HOME}/WhatsApp" 2> /dev/null
-sudo mkdir "${HOME}/WhatsApp" | log || error  "Failed creating folder in your home folder."
-directory="${HOME}/WhatsApp"
-cd "$directory" | log || error  "Failed to cd to $directory"
-touch log.txt
-echo ""
-
 # Log errors
 function log {
   tee "$directory/log.txt"
 }
+
+# Create new WhatsApp directory and a blank file to store logs 
+sudo rm -rf "${HOME}/WhatsApp" 2> /dev/null
+mkdir "${HOME}/WhatsApp" || error  "Failed creating folder in your home folder."
+directory="${HOME}/WhatsApp"
+cd "$directory" | log || error  "Failed to cd to $directory"
+touch log.txt
+echo ""
 
 # Identifying the system package manager
 if command -v apt > /dev/null; then
