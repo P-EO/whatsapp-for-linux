@@ -1,5 +1,5 @@
 [Desktop Entry]
 Name=WhatsApp
 Type=Application
-Exec=$HOME/WhatsApp/WhatsApp-linux-`uname -m`/run-whatsapp.sh
+Exec=$HOME/WhatsApp/WhatsApp-linux-`uname -m`/run-whatsapp
 Icon=$HOME/WhatsApp/whatsapp.png
