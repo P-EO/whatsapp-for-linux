@@ -16,11 +16,6 @@ function reduceoutput {
   grep -v "apt does not have a stable CLI interface.\\|are up to date\\|Hit\\|Packaging\\|Preparing\\|Converting\\|Finalizing\\|App built to\\|shortcuts are up to you\\|to remove\\|Reading package lists...\\|newest version\\|Building dependency tree\\|Reading state information...\\|Need to get\\|After this operation,\\|Get:\\|Fetched\\|Selecting previously unselected package\\|Preparing to unpack\\|Unpacking \\|Setting up \\|Processing triggers for "
 }
 
-# Log errors
-function log {
-  tee "$directory/log.txt"
-}
-
 # Check if user using root privilege to run this script
 if [[ "$(id -u)" == 0 ]]; then
 	error "This script is not designed to be runned as root! Please try again as a regular user." 
@@ -33,6 +28,11 @@ directory="${HOME}/WhatsApp"
 cd "$directory" | log || error  "Failed to cd to $directory"
 touch log.txt
 echo ""
+
+# Log errors
+function log {
+  tee "$directory/log.txt"
+}
 
 # Identifying the system package manager
 if command -v apt > /dev/null; then
