@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+echo -e "\\n"
 echo -e "   ▄▄\\e[42m█▀▀▀▀▀▀▀█\\e[49m▄▄\\e[92m       _       ____          __       __    _              \\e[0m
 ▄█\\e[42m▀   ▄▄       ▀█\\e[49m▄\\e[92m    | |     / / /_  ____ _/ /______/ /   (_)___  __  ___  __\\e[0m
 █\\e[42m    ███         █\\e[49;92m    | | /| / / __ \/ __ '/ __/ ___/ /   / / __ \/ / / / |/_/\\e[0m
@@ -10,7 +11,9 @@ echo -e "   ▄▄\\e[42m█▀▀▀▀▀▀▀█\\e[49m▄▄\\e[92m       _
   █\\e[42m    ▄▄▄▄▄\\e[49m█▀▀
  ▄\\e[42m▀ ▄\\e[49m█▀
  ▀▀▀"
+echo -e "\\n\\n"
 
+sleep 5s
  
 # A simple error function
 function error {
@@ -106,14 +109,29 @@ fi
 # Identifying architecture
 arch=$(uname -m)
 
-# Fix nativefier can't detect x86_64 architecture
-if [ "$arch" == x86_64 ]; then
+# Fix nativefier can't detect architecture
+# https://stackoverflow.com/questions/45125516/possible-values-for-uname-m
+
+if [ "$arch" == "x86_64" ] || [ "$arch" = "ia64" ]; then
     arch=x64 
 fi
 
+if [ "$arch" = "i386" ] || [ "$arch" = "i686" ];then 
+    arch=ia32
+fi
+
+if [ "$arch" = "aarch64_be" ] || [ "$arch" = "aarch64" ] || [ "$arch" = "armv8b" ] || [ "$arch" = "armv8l" ]; then
+    arch=arm64
+fi 
+
+if [ "$arch" = "arm" ]; then
+    arch=armv7l
+fi 
+
+
 echo -e "\n\n"
 
-#Nativefying WhatsApp
+# Nativefying WhatsApp
 if command -v nativefier > /dev/null; then
     success "Nativefying WhatsApp from http://web.whatsapp.com ..."
     cd "$directory" || error "Failed to cd to $directory"
@@ -126,17 +144,20 @@ fi
 
 echo -e "\n"
 
-#Create desktop & menu shortcut
+# Create desktop & menu shortcut
 success "Creating desktop shortcut and menu shortcut..."
 echo ""
 cd "$directory" || error "Failed to cd to $directory."
-git clone https://github.com/ITdairy/whatsapp-for-linux
+git clone https://github.com/ITdairy/whatsapp-for-linux -v
 echo -e "\n"
-sed -i "s@HOME@$HOME@g" ./whatsapp.desktop 
-sudo cp ./whatsapp-for-linux/* ./ && sudo rm -rf ./whatsapp-for-linux
-sudo cp ./whatsapp.desktop "$HOME/.local/share/applications" | log
-sudo cp ./whatsapp.desktop "$HOME/Desktop" | log
-sudo cp ./run-whatsapp ./WhatsApp-linux-$arch
+sudo cp $directory/whatsapp-for-linux/* ./ && sudo rm -rf $directory/whatsapp-for-linux
+sed -i "s@HOME@$HOME@g" $directory/whatsapp.desktop 
+sed -i "s@arch@$arch@g" $directory/whatsapp.desktop 
+sudo cp $directory/whatsapp.desktop "$HOME/.local/share/applications" | log
+sudo cp $directory/whatsapp.desktop "$HOME/Desktop" | log
+sudo cp $directory/run-whatsapp $directory/WhatsApp-linux-$arch
+sudo chmod +x $directory/WhatsApp-linux-$arch/run-whatsapp
+echo -e "\n"
 success "Done! You should be able to run WhatsApp from desktop and menu bar."
 echo -e "\n\n"
 cd "$HOME"  || exit 
