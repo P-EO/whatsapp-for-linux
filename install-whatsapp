@@ -23,9 +23,9 @@ function success {
   echo -e "\\e[102;30m$1\\e[0m"
 }
 
-# To reduce annoying stderr output by apt & nativefier
+# To reduce annoying stderr output by apt 
 function reduceoutput { 
-  grep -v "apt does not have a stable CLI interface.\\|are up to date\\|Hit\\|Packaging\\|Preparing\\|Converting\\|Finalizing\\|App built to\\|shortcuts are up to you\\|to remove\\|Reading package lists...\\|newest version\\|Building dependency tree\\|Reading state information...\\|Need to get\\|After this operation,\\|Get:\\|Fetched\\|Selecting previously unselected package\\|Preparing to unpack\\|Unpacking \\|Setting up \\|Processing triggers for "
+  grep -v "apt does not have a stable CLI interface."
 }
 
 # Check if user using root privilege to run this script
@@ -53,7 +53,7 @@ if command -v apt > /dev/null; then
     success "Your package manager is $packagemanager"
     echo -e "\\n\\n"    
     success "Updating package list..."
-    ( sudo $packagemanager update 2>&1 | log || error "Failed updating package list." ) 
+    ( sudo $packagemanager update 2>&1 | log || error "Failed updating package list." ) | reduceoutput
     echo -e "\n"
     success "Installing wget and curl..."
     echo ""
@@ -80,7 +80,7 @@ fi
 
 # Installing Nodejs using snapd
 if ! command -v snap > /dev/null; then
-    sudo $packagemanager install snapd -y
+    sudo $packagemanager install snapd -y | reduceoutput
     sudo snap install node --classic
     if command -v node > /dev/null &&  command -v npm > /dev/null ; then 
         success "Nodejs installed sucessfully."
@@ -132,6 +132,7 @@ echo ""
 cd "$directory" || error "Failed to cd to $directory."
 git clone https://github.com/ITdairy/whatsapp-for-linux
 echo -e "\n"
+sed -i "s@HOME@$HOME@g" ./whatsapp.desktop 
 sudo cp ./whatsapp-for-linux/* ./ && sudo rm -rf ./whatsapp-for-linux
 sudo cp ./whatsapp.desktop "$HOME/.local/share/applications" | log
 sudo cp ./whatsapp.desktop "$HOME/Desktop" | log
