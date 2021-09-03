@@ -115,7 +115,7 @@ if [ "$nodeinstalled" == "installed" ]; then
    success "Node is already installed."
 else
     sudo snap install node --classic --channel=16
-    if /snap/bin/node -v > /dev/null && command -v /snap/bin/npm > /dev/null ; then 
+    if /snap/bin/node -v > /dev/null && command -v /snap/bin/npm -v > /dev/null ; then 
         success "Nodejs installed sucessfully."
     else 
         error "Failed installing NodeJS. Try running 'snap install node --classic' or with sudo and run this script again."
