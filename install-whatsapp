@@ -107,6 +107,8 @@ echo -e "\n"
 # Installing node using snap
 progress "Installing node..."
 echo ""
+# Uninstall nodejs node and npm first if exists
+sudo $packagemanager uninstall nodejs node npm
 snap info node | grep 'installed' > /dev/null | log
 if [ $? == 0 ]; then
    success "Node is already installed."
