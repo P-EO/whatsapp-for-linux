@@ -109,7 +109,7 @@ progress "Installing node..."
 echo ""
 # Uninstall nodejs node and npm first if exists
 sudo $packagemanager remove nodejs node npm -y 2>&1 > /dev/null
-snap info node | grep 'installed' > /dev/null | log
+snap info node | grep 'installed' > /dev/null 
 if [ $? == 0 ]; then
    success "Node is already installed."
 else
