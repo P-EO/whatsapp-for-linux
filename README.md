@@ -7,7 +7,7 @@ NOT AVAILABLE YET, YOU WILL GET ERROR IF YOU INSTALL
 ### Install by:
 
 ```
-wget -qO- https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/installwhatsapp | sudo bash
+wget -qO- https://raw.githubusercontent.com/ITdairy/whatsapp-for-linux/main/install-whatsapp | bash
 ```
 
 ___________________________________________________________________________
