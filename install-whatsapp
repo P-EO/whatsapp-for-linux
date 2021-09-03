@@ -34,7 +34,7 @@ function success {
 
 # To reduce some annoying output
 function reduceoutput { 
-  grep -v "apt does not have a stable CLI interface.\|snap "node" is already installed" 
+  grep -v "apt does not have a stable CLI interface."
 }
 
 # Check if user using root privilege to run this script
@@ -92,12 +92,13 @@ else
     error "Package manager not found. This script only support apt, yum and dnf."
 fi
 
+sleep 1 
 
 # Install snapd if not installed
 progress "Installing snap..."
-echo ""
+echo -e "\n"
 if ! command -v snap > /dev/null; then
-    sudo $packagemanager install snapd -y | reduceoutput
+    sudo $packagemanager install snapd -y | tail -n +3
 else 
     success "Snap is already installed."
 fi
@@ -106,14 +107,14 @@ echo -e "\n"
 
 # Installing node using snap
 progress "Installing node..."
-echo ""
+echo -e "\n"
 # Uninstall nodejs node and npm first if exists
-sudo $packagemanager remove nodejs node npm -y 2>&1 > /dev/null
-snap info node | grep 'installed' > /dev/null 
-if [ $? == 0 ]; then
+sudo $packagemanager remove nodejs npm -y > /dev/null 2> /dev/null 
+nodeinstalled=$(snap info node | grep -o 'installed')
+if [ "$nodeinstalled" == "installed" ]; then
    success "Node is already installed."
 else
-    sudo snap install node --classic | reduceoutput
+    sudo snap install node --classic --channel=16
     if command -v node > /dev/null && command -v npm > /dev/null ; then 
         success "Nodejs installed sucessfully."
     else 
@@ -125,9 +126,11 @@ echo -e "\n"
 
 # Installing Nativefier
 progress "Installing Nativefier..."
-echo ""
+echo -e "\n"
+sudo ln -sfn /snap/node/current/bin/node /usr/bin/node || error "Failed make soft link to /usr/bin."
 if ! command -v nativefier > /dev/null; then
-    npm install -g nativefier | log || error  "Failed installing Nativefier. Try running 'npm install -g nativefier' or with sudo and run this script again."
+    sudo /snap/bin/npm install -g nativefier | log || error  "Failed installing Nativefier. Try running 'npm install -g nativefier' or 'sudo /snap/bin/npm install -g nativefier' and run this script again."
+    echo ""
     if command -v nativefier > /dev/null; then
         success "Nativefier installed successfully."
     else 
@@ -163,14 +166,14 @@ if [ "$arch" = "arm" ]; then
 fi 
 
 
-echo -e "\n\n"
+echo -e "\n"
 
 # Nativefying WhatsApp
 if command -v nativefier > /dev/null; then
     progress "Nativefying WhatsApp from http://web.whatsapp.com ..."
     cd "$directory" || error "Failed to cd to $directory"
     (nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a "$arch" --maximize -n WhatsApp ) 
-    echo -e "\n"
+    echo -e ""
     success "Successfully nativefied WhatsApp."
 else
     error "Failed. Nativefier not found. Try running 'npm install -g nativefier' or with root 'sudo npm install -g nativefier' and run this script again. "
@@ -181,7 +184,7 @@ echo -e "\n"
 # Create desktop & menu shortcut
 progress "Creating desktop shortcut and menu shortcut..."
 echo ""
-if  ! [ $(pwd) == $directory ]; then 
+if  ! [ "$(pwd)" == $directory ]; then 
     cd "$directory" || error "Failed to cd to $directory."
 fi
 git clone https://github.com/ITdairy/whatsapp-for-linux -v
