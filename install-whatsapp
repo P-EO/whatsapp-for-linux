@@ -114,7 +114,7 @@ nodeinstalled=$(snap info node | grep -o 'installed')
 if [ "$nodeinstalled" == "installed" ]; then
    success "Node is already installed."
 else
-    sudo snap install node --classic --channel=16
+    sudo snap install node --classic --channel=14
     if command -v node > /dev/null && command -v npm > /dev/null ; then 
         success "Nodejs installed sucessfully."
     else 
