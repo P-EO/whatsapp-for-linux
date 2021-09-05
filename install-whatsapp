@@ -193,6 +193,7 @@ sudo cp $directory/whatsapp-for-linux/* ./ && sudo rm -rf $directory/whatsapp-fo
 sed -i "s@HOME@$HOME@g" $directory/whatsapp.desktop 
 sed -i "s@arch@$arch@g" $directory/whatsapp.desktop 
 sed -i "s@arch@$arch@g" $directory/run-whatsapp
+sed -i "s@HOME@$HOME@g" $directory/run-whatsapp
 sudo cp $directory/whatsapp.desktop "$HOME/.local/share/applications" | log
 sudo cp $directory/whatsapp.desktop "$HOME/Desktop" | log
 sudo cp $directory/run-whatsapp $directory/WhatsApp-linux-$arch
