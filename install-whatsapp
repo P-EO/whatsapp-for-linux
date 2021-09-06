@@ -42,6 +42,11 @@ function log {
   tee "$directory/log.txt"
 }
 
+# Check if user using root privilege to run this script
+if [[ "$(id -u)" == 0 ]]; then
+	error "This script is not designed to be runned as root! Please try again as a regular user." 
+fi
+
 # Create new WhatsApp directory and a blank file to store logs 
 progress "Creating new folder in '$HOME' folder..."
 echo ""
