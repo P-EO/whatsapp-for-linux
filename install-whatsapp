@@ -37,11 +37,6 @@ function reduceoutput {
   grep -v "apt does not have a stable CLI interface."
 }
 
-# Check if user using root privilege to run this script
-if [[ "$(id -u)" == 0 ]]; then
-	error "This script is not designed to be runned as root! Please try again as a regular user." 
-fi
-
 # Log errors
 function log {
   tee "$directory/log.txt"
