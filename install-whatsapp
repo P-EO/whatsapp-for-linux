@@ -21,7 +21,7 @@ function error {
   exit 1 
 }
 
-# A simple 
+# A simple function to wrap progress text
 function progress {
   echo -e "\\e[34m#####################################################\\e[0m\\n\\e[96m$1\\e[0m\\n\\e[34m#####################################################\\e[0m"
 }
@@ -172,7 +172,7 @@ echo -e "\n"
 if command -v nativefier > /dev/null; then
     progress "Nativefying WhatsApp from http://web.whatsapp.com ..."
     cd "$directory" || error "Failed to cd to $directory"
-    (nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a "$arch" --maximize -n WhatsApp ) 
+    nativefier https://web.whatsapp.com --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" -a "$arch" --maximize -n WhatsApp  
     echo -e ""
     success "Successfully nativefied WhatsApp."
 else
