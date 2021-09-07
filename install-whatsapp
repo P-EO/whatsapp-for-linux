@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+((
 echo -e "\\n"
 echo -e "   ▄▄\\e[42m█▀▀▀▀▀▀▀█\\e[49m▄▄\\e[92m       _       ____          __       __    _              \\e[0m
 ▄█\\e[42m▀   ▄▄       ▀█\\e[49m▄\\e[92m    | |     / / /_  ____ _/ /______/ /   (_)___  __  ___  __\\e[0m
@@ -21,7 +22,7 @@ function error {
   exit 1 
 }
 
-# A simple 
+# A simple function to display progress message
 function progress {
   echo -e "\\e[34m#####################################################\\e[0m\\n\\e[96m$1\\e[0m\\n\\e[34m#####################################################\\e[0m"
 }
@@ -42,10 +43,6 @@ if [[ "$(id -u)" == 0 ]]; then
 	error "This script is not designed to be runned as root! Please try again as a regular user." 
 fi
 
-# Log errors
-function log {
-  tee "$directory/log.txt"
-}
 
 # Create new WhatsApp directory and a blank file to store logs 
 progress "Creating new folder in '$HOME' folder..."
@@ -202,3 +199,4 @@ echo -e "\\n\\n"
 success "Done! You should be able to run WhatsApp from desktop and menu bar."
 echo -e "\\n\\n"
 cd "$HOME"  || exit 
+) 2>&1 ) | tee ~/log.txt
