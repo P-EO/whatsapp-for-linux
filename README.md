@@ -1,6 +1,10 @@
 # WhatsApp for Linux
 
-## **UNDER MAINTAINENCE**
+#### For Raspberry Pi User:
+[![badge](https://github.com/Botspot/pi-apps/blob/master/icons/badge.png?raw=true)](https://github.com/Botspot/pi-apps)  
+
+
+## **OTHER OS UNDER MAINTAINENCE**
 NOT AVAILABLE YET, YOU WILL GET ERROR IF YOU INSTALL 
 
 ---------------------------------------
